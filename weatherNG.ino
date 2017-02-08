@@ -48,6 +48,9 @@ byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing pack
 WiFiUDP udp;
 
 
+unsigned long live_counter = 0;
+unsigned long last_live_counter = 0;
+
 
 void setup()
 {
@@ -155,18 +158,30 @@ void checkWifi() {
     GD.cmd_number(500, 160,   27, OPT_CENTER, secsSince1900);
 
     GD.cmd_text(700, 160,   27, OPT_CENTER,& hour[0]);
-        GD.cmd_text(719, 160,   27, OPT_CENTER, ":");
+    GD.cmd_text(719, 160,   27, OPT_CENTER, ":");
     GD.cmd_text(740, 160,   27, OPT_CENTER, &minute[0]);
 
   }
 
-  if (timeFetched == false) {
+  if (timeFetched == false || live_counter > last_live_counter + 100) {
     Serial.println("Time not fetched yet");
-
     timeFetched = getTime();
+    if (timeFetched == true) {
+      last_live_counter = live_counter;
+    }
   }
+
+ 
 }
 
+void displayTime() {
+    GD.cmd_text(300, 160,   27, OPT_CENTER, "Seconds since Jan 1 1900 : ");
+    GD.cmd_number(500, 160,   27, OPT_CENTER, secsSince1900);
+
+    GD.cmd_text(700, 160,   27, OPT_CENTER,& hour[0]);
+    GD.cmd_text(719, 160,   27, OPT_CENTER, ":");
+    GD.cmd_text(740, 160,   27, OPT_CENTER, &minute[0]);
+}
 
 int packets = 0;
 int sentRequest = false;
@@ -187,7 +202,7 @@ bool getTime()
       sentRequest = true;
  // }
   // wait to see if a reply is available
-  delayWithYield(1000);
+  delayWithYield(500);
   
   int cb = udp.parsePacket();
   if (!cb) {
@@ -287,14 +302,15 @@ unsigned long sendNTPpacket(IPAddress& address)
 int outsize_screen = 20; // how many pixels outside screen we will use
 int walker_figure = 0;
 int walker_position = -outsize_screen;
-int live_counter;
+
+
 
 void loop()
 {
   GD.ClearColorRGB(0x0000ee);
   GD.Clear();
 
-  //drawRandomCircles(100);
+  drawRandomCircles(100);
   yield();
   drawMainText();
 
@@ -312,8 +328,10 @@ void loop()
   GD.ColorRGB(255,255,255);
   GD.ColorA(255);
   GD.cmd_number(10, 440 , 27, OPT_CENTERY, live_counter);
+  GD.cmd_number(300, 460 , 27, OPT_CENTERY, last_live_counter);
 
   checkWifi();
+  displayTime();
 
   GD.swap();    
   delayWithYield(100);
