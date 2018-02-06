@@ -18,8 +18,8 @@ public:
     digitalWrite(CS, HIGH);
     SPI.begin();
 
-    SPI.beginTransaction (SPISettings (600000, MSBFIRST, SPI_MODE0));
-    //SPI.setClockDivider(SPI_CLOCK_DIV2);
+    SPI.beginTransaction (SPISettings (100000, MSBFIRST, SPI_MODE0));
+    SPI.setClockDivider(SPI_CLOCK_DIV32);
 
 #ifdef TEENSYDUINO
     SPI.beginTransaction(SPISettings(3000000, MSBFIRST, SPI_MODE0));
@@ -43,9 +43,9 @@ public:
     Serial.println(stat, HEX);
 
     
-    while ((__rd16(0xc0000UL) & 0xff) != 0x08)
-      ;
-
+    while ((__rd16(0xc0000UL) & 0xff) != 0x08) {
+      //yield(); // avoid 8266 reset while waiting...
+    };
 
     stat = __rd16(0xc0000UL) & 0xff;
     Serial.print("status:");
