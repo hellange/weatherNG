@@ -1,8 +1,10 @@
 # weatherNG
 
-Starting point for a 7" LCD wifi enabled weather station.
+Starting point for a 800x480 7" LCD wifi enabled weather station.
 
 Currently only adding relevant library and stuff to code cloned from https://github.com/hellange/esp8266/tree/master/VM810C_gameduino_minimized
+
+Code is currently also tested on a 5" LCD, ref https://weatherhelge.wordpress.com/2018/02/06/5-800x480-capacitive-touch-lcd-with-built-in-ft811-graphics-controller/
 
 
 
